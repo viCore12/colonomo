@@ -71,7 +71,6 @@ def factory_from_args(args):
 
     return args, dic_models
 
-
 def webcam(args):
 
     assert args.mode in 'mono'

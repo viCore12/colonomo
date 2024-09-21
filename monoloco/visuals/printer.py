@@ -3,6 +3,8 @@ Class for drawing frontal, bird-eye-view and multi figures
 """
 # pylint: disable=attribute-defined-outside-init
 import math
+from io import BytesIO
+from PIL import Image
 from collections import OrderedDict
 
 import matplotlib.pyplot as plt
@@ -10,6 +12,9 @@ from matplotlib.patches import Rectangle, Circle, FancyArrow
 
 from .pifpaf_show import KeypointPainter, get_pifpaf_outputs
 from ..utils import pixel_to_camera
+
+
+import os
 
 
 def get_angle(xx, zz):
@@ -62,7 +67,7 @@ class Printer:
         self.webcam = args.webcam
         self.show_all = args.show_all or self.webcam
         self.show = args.show_all or self.webcam
-        self.save = not args.no_save and not self.webcam
+        self.save = True#not args.no_save and not self.webcam
         self.plt_close = not self.webcam
         self.activities = args.activities
         self.hide_distance = args.hide_distance
@@ -229,7 +234,6 @@ class Printer:
                     number['num'] += 1
 
     def draw(self, figures, axes, image, dic_out, annotations=None):
-
         # whether to include instances that don't match the ground-truth
         if self.zz_pred is not None:
             iterator = range(len(self.zz_pred)) if self.show_all else range(len(self.zz_gt))
@@ -261,6 +265,7 @@ class Printer:
                 fig.show()
             if self.plt_close:
                 plt.close(fig)
+        return figures
 
     def _draw_front(self, ax, z, idx, number):
 

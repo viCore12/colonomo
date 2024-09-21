@@ -12,7 +12,9 @@ import json
 import copy
 import logging
 import time
+import cv2
 from collections import defaultdict
+from PIL import Image
 
 import numpy as np
 import torch
@@ -155,7 +157,6 @@ def factory_from_args(args):
 
     return args, dic_models
 
-
 def predict(args):
 
     cnt = 0
@@ -174,7 +175,8 @@ def predict(args):
     predictor = Predictor(checkpoint=args.checkpoint)
 
     # data
-    data = datasets.ImageList(args.images, preprocess=predictor.preprocess)
+    data = datasets.ImageList(args.images, preprocess=predictor.preprocess_factory)
+    
     if args.mode == 'stereo':
         assert len(data.image_paths) % 2 == 0, "Odd number of images in a stereo setting"
 
@@ -182,7 +184,7 @@ def predict(args):
     start = time.time()
     timing = []
     for idx, (pred, _, meta) in enumerate(predictor.images(args.images, batch_size=args.batch_size)):
-
+        
         if idx % args.batch_size != 0:  # Only for MonStereo
             pifpaf_outs['right'] = [ann.json_data() for ann in pred]
         else:
@@ -196,7 +198,6 @@ def predict(args):
             pifpaf_outs['left'] = [ann.json_data() for ann in pred]
             pifpaf_outs['file_name'] = meta['file_name']
             pifpaf_outs['width_height'] = meta['width_height']
-
             # Set output image name
             if args.output_directory is None:
                 splits = os.path.split(meta['file_name'])
@@ -205,7 +206,6 @@ def predict(args):
                 file_name = os.path.basename(meta['file_name'])
                 output_path = os.path.join(
                     args.output_directory, 'out_' + file_name)
-
             im_name = os.path.basename(meta['file_name'])
             print(f'{idx} image {im_name} saved as {output_path}')
 
@@ -223,8 +223,8 @@ def predict(args):
                     kk = load_calibration(args.calibration, im_size, focal_length=args.focal_length)
                     dic_gt = None
                 # Preprocess pifpaf outputs and run monoloco
-                boxes, keypoints = preprocess_pifpaf(
-                    pifpaf_outs['left'], im_size, enlarge_boxes=False)
+                boxes, keypoints = preprocess_pifpaf(##############################################
+                    pifpaf_outs['left'], im_size, enlarge_boxes=False)#############################
 
                 if args.mode == 'mono':
                     LOG.info("Prediction with MonoLoco++")
@@ -286,3 +286,6 @@ def factory_outputs(args, pifpaf_outs, dic_out, output_path, kk=None):
             printer = Printer(cpu_image, output_path, kk, args)
             figures, axes = printer.factory_axes(dic_out)
             printer.draw(figures, axes, cpu_image, dic_out)
+        
+
+    

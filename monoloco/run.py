@@ -1,7 +1,5 @@
 # pylint: disable=too-many-branches, too-many-statements, import-outside-toplevel
-
 import argparse
-
 from openpifpaf import decoder, network, visualizer, show, logger
 
 
@@ -64,6 +62,11 @@ def cli():
     predict_parser.add_argument('--dropout', type=float, help='dropout parameter', default=0.2)
     predict_parser.add_argument('--show_all', help='only predict ground-truth matches or all', action='store_true')
     predict_parser.add_argument('--webcam', help='monstereo streaming', action='store_true')
+
+    predict_parser.add_argument('--video_in', help='video streaming function', action='store_true')
+    predict_parser.add_argument('--video_path_in', help='video streaming input path', default=None)
+    predict_parser.add_argument('--video_path_out', help='video streaming output path', default=None)
+
     predict_parser.add_argument('--camera', help='device to use for webcam streaming', type=int, default=0)
     predict_parser.add_argument('--calibration', help='type of calibration camera, either custom, nuscenes, or kitti',
                                 type=str, default='custom')
@@ -142,6 +145,11 @@ def main():
         if args.webcam:
             from .visuals.webcam import webcam
             webcam(args)
+        elif args.video_in:
+            from .visuals.video import process_video
+            process_video(args)
+            # from .predict import predict_video
+            # predict_video(args)
         else:
             from .predict import predict
             predict(args)

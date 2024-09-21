@@ -1,0 +1,14 @@
+IMAGE
+MONOLOCO
+python3 -m monoloco.run predict docs/002282.png --path_gt monoloco/names-kitti-200615-1022.json -o output_directory --long-edge 2500 --show_all
+STEREO
+python3 -m monoloco.run predict --glob docs/000840*.png --path_gt monoloco/names-kitti-200615-1022.json -o output_dir
+ectory --long-edge 2500 --show_all --mode stereo
+
+VIDEO
+A) 3D Localization
+python3 -m monoloco.run predict --video_in --video_path_in docs/palace.mp4 --video_path_out output_directory/output_vi.avi --output_types multi --path_gt monoloco/names-kitti-200615-1022.jso --long-edge 1000
+B) Social Distancing (and Talking activity)
+python3 -m monoloco.run predict --video_in --activities social_distance --video_path_in docs/22456.mp4 --video_path_out output_directory/output_video.mp4 --output_types multi
+C) Hand-raising detection
+python3 -m monoloco.run predict --video_in --activities raising_hand --video_path_in docs/22456.mp4 --video_path_out output_directory/output_video.mp4 --output_types multi
